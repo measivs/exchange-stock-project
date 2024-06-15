@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %} {{ company_data['Company'] }} - Details {% endblock %}
+
+{% block content %}
+
+<h1> {{company_data }} </h1>
+
+
+    <a href="{{ url_for('home') }}">Back to Home</a>
+{% endblock %}

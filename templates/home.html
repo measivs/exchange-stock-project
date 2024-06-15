@@ -1,8 +1,21 @@
-{% extends 'base.html' %}
-
-{% block title %} List of Exchange Stocks {%endblock%}
-
-{% block content %}
-<h1>Hello Home</h1>
-<h2>{{data}}</h2>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Exchange Stocks</title>
+</head>
+<body>
+    <h1>Hello Home</h1>
+    <h2>List of Companies</h2>
+    <table border="1">
+        <tr>
+            <th>Company</th>
+        </tr>
+        {% for company in companies %}
+        <tr>
+            <td><a href="{{ url_for('company_details', name=company) }}">{{ company }}</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
