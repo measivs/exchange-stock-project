@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 <h2>Hello About</h2>
-{{ super() }}
+<!--{{ super() }}-->
 
 <h1> Welcome {{ session['username'] }} </h1>
-{% endblock %}
+{% endblock content %}
 
 {% block title %} About Page {%endblock%}
