@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from bs4 import BeautifulSoup
 import requests
 import logging
-from flask_wtf import FlaskForm
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -11,14 +10,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///loginn.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-class user(db.Model):
+
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80))
-    email = db.Column(db.String(120))
-    password = db.Column(db.String(80))
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(80), nullable=False)
 
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
 def fetch_company_names(limit=50):
     companies = []
     h = {
@@ -57,7 +59,6 @@ def fetch_company_names(limit=50):
             continue
 
     return companies
-
 
 
 def analyze_company(company):
@@ -109,7 +110,6 @@ def home():
         return str(e), 500
 
 
-
 @app.route('/company/<name>')
 def company_details(name):
     try:
@@ -145,19 +145,18 @@ def register():
     return render_template("register.html")
 
 
-@app.route("/register", methods=["GET", "POST"])
-def register():
+@app.route('/login', methods=["GET", "POST"])
+def login():
     if request.method == "POST":
-        uname = request.form['uname']
-        mail = request.form['mail']
-        passw = request.form['passw']
-
-        register = user(username = uname, email = mail, password = passw)
-        db.session.add(register)
-        db.session.commit()
-
-        return redirect(url_for("login"))
-    return render_template("register.html")
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username, password=password).first()
+        if user:
+            session['username'] = user.username
+            return redirect(url_for('user'))
+        else:
+            return "Invalid credentials"
+    return render_template('login.html')
 
 
 @app.route('/logout')
