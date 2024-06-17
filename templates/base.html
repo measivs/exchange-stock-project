@@ -18,13 +18,15 @@
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
               <a class="nav-link" aria-current="page" href="/">Home</a>
-              <a class="nav-link" href="/about">about</a>
+              
               {% if 'username' not in session %}
+              
               <a class="nav-link" href="{{url_for('login')}}">login</a>
               <a class="nav-link" href="{{url_for('register')}}">register</a>
               {% endif %}
 
               {% if 'username' in session %}
+              <a class="nav-link" href="{{url_for('personal')}}">personal</a>
               <a class="nav-link" href="{{url_for('logout')}}">logout</a>
               {% endif %}
             </div>

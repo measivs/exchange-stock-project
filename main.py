@@ -124,9 +124,9 @@ def company_details(name):
         return str(e), 500
 
 
-@app.route('/about')
-def about():
-    return render_template('about.html')
+@app.route('/personal')
+def personal():
+    return render_template('personal.html')
 
 
 @app.route('/register', methods=["GET", "POST"])
@@ -141,7 +141,7 @@ def register():
         db.session.commit()
 
         session['username'] = uname
-        return redirect(url_for("about"))
+        return redirect(url_for("personal"))
     return render_template("register.html")
 
 
