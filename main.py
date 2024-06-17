@@ -153,7 +153,7 @@ def login():
         user = User.query.filter_by(username=username, password=password).first()
         if user:
             session['username'] = user.username
-            return redirect(url_for('user'))
+            return redirect(url_for('personal'))
         else:
             return "Invalid credentials"
     return render_template('login.html')
@@ -165,11 +165,11 @@ def logout():
     return render_template('logout.html')
 
 
-@app.route('/user')
-def user():
-    if 'username' in session:
-        return render_template('user.html', username=session['username'])
-    return redirect(url_for('login'))
+# @app.route('/user')
+# def user():
+#     if 'username' in session:
+#         return render_template('user.html', username=session['username'])
+#     return redirect(url_for('login'))
 
 
 if __name__ == '__main__':

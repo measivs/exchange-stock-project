@@ -19,7 +19,6 @@
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
               <a class="nav-link" aria-current="page" href="/">Home</a>
-              <!-- <a class="nav-link" href="/personal">personal</a> -->
               {% if 'username' not in session %}
               <a class="nav-link" href="{{url_for('login')}}">login</a>
               {% endif %}

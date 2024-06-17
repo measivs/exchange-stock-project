@@ -1,8 +1,17 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
+<style>
+  .centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+</style>
 
-<h1> Good Bye! {{ session['username'] }} </h1>
-
-<!-- {% endblock %} -->
+<div class="centered">
+  <h1>Good Bye!</h1>
+</div>
+{% endblock %}
+ 
