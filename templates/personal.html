@@ -1,8 +1,8 @@
-{% extends 'base.html' %}
+{% extends 'home.html' %}
+
+<h1> Welcome {{ session['username'] }}! </h1>
 
 {% block content %}
 
-<h1> Welcome {{ session['username'] }}! </h1>
-<!-- {% endblock content %} -->
+<!-- {% endblock %} -->
 
-{% block title %} personal Page {%endblock%}

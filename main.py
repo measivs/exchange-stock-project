@@ -126,7 +126,16 @@ def company_details(name):
 
 @app.route('/personal')
 def personal():
-    return render_template('personal.html')
+    try:
+        companies = fetch_company_names(limit=50)
+        if companies:
+            return render_template('home.html', companies=companies)
+        else:
+            logging.error("No companies found.")
+            return "No companies found.", 500
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        return str(e), 500
 
 
 @app.route('/register', methods=["GET", "POST"])
