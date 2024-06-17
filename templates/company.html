@@ -1,11 +1,35 @@
 {% extends 'base.html' %}
 
-{% block title %} {{ company_data['Company'] }} - Details {% endblock %}
+{% block title %}{{ company_data['Company'] }} - Details{% endblock %}
 
 {% block content %}
+<h1>{{ company_data['Company'] }} - Details</h1>
 
-<h1> {{company_data }} </h1>
+<table>
+  <tr class="info-row">
+    <th>Company</th>
+    <td>{{ company_data['Company'] }}</td>
+  </tr>
+  <tr class="info-row">
+    <th>Avg. Estimate</th>
+    <td>{{ company_data['Avg. Estimate'] }}</td>
+  </tr>
+  <tr class="info-row">
+    <th>Low Estimate</th>
+    <td>{{ company_data['Low Estimate'] }}</td>
+  </tr>
+  <tr class="info-row">
+    <th>High Estimate</th>
+    <td>{{ company_data['High Estimate'] }}</td>
+  </tr>
+  <tr class="info-row">
+    <th>Sales Growth (year/est)</th>
+    <td>{{ company_data['Sales Growth (year/est)'] }}</td>
+  </tr>
+</table>
+
+<a href="{{ url_for('home') }}">Back to Home</a>
+<!-- {% endblock %} -->
 
 
-    <a href="{{ url_for('home') }}">Back to Home</a>
-{% endblock %}
+

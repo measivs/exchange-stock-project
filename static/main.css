@@ -58,6 +58,7 @@
 /*a:hover {*/
 /*    color: #4CAF50;*/
 /*}*/
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -120,4 +121,36 @@ a {
 a:hover {
     color: #4CAF50;
 }
+
+.info-row th,
+.info-row td {
+    padding: 15px; 
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    background-color: #111111; 
+    color: #f8f4f4; 
+}
+
+.btn-color{
+    background-color: #0e1c36;
+    color: #fff;
+    
+  }
+  
+  .profile-image-pic{
+    height: 200px;
+    width: 200px;
+    object-fit: cover;
+  }
+  
+  
+  
+  .cardbody-color{
+    background-color: #ebf2fa;
+  }
+  
+  a{
+    text-decoration: none;
+  }
+
 

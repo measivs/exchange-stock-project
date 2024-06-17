@@ -2,9 +2,11 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from bs4 import BeautifulSoup
 import requests
 import logging
+from flask_wtf import FlaskForm
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'HelloBTU'
+app.config['SECRET_KEY'] = 'MEALIZI'
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 def fetch_company_names(limit=50):
@@ -56,7 +58,7 @@ def analyze_company(company):
     logging.debug(f"Fetching URL for analysis: {url}")
     try:
         r = requests.get(url, headers=h)
-        r.raise_for_status()  # Raise HTTPError for bad responses
+        r.raise_for_status()
         content = r.text
 
         soup = BeautifulSoup(content, 'html.parser')
@@ -86,7 +88,7 @@ def analyze_company(company):
 @app.route('/home')
 def home():
     try:
-        companies = fetch_company_names(limit=50)  # Adjust this to the number of companies you want
+        companies = fetch_company_names(limit=50)
         if companies:
             return render_template('home.html', companies=companies)
         else:
