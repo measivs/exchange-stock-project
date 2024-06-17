@@ -7,6 +7,16 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'MEALIZI'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///loginn.sqlite'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+class user(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80))
+    email = db.Column(db.String(120))
+    password = db.Column(db.String(80))
+
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 def fetch_company_names(limit=50):
@@ -119,13 +129,35 @@ def about():
     return render_template('about.html')
 
 
-@app.route('/login', methods=['POST', 'GET'])
-def login():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        session['username'] = email
-        return redirect(url_for('user'))
-    return render_template('login.html')
+@app.route('/register', methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        uname = request.form['uname']
+        mail = request.form['mail']
+        passw = request.form['passw']
+
+        new_user = User(username=uname, email=mail, password=passw)
+        db.session.add(new_user)
+        db.session.commit()
+
+        session['username'] = uname
+        return redirect(url_for("about"))
+    return render_template("register.html")
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        uname = request.form['uname']
+        mail = request.form['mail']
+        passw = request.form['passw']
+
+        register = user(username = uname, email = mail, password = passw)
+        db.session.add(register)
+        db.session.commit()
+
+        return redirect(url_for("login"))
+    return render_template("register.html")
 
 
 @app.route('/logout')
@@ -142,4 +174,6 @@ def user():
 
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)

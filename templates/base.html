@@ -21,6 +21,7 @@
               <a class="nav-link" href="/about">about</a>
               {% if 'username' not in session %}
               <a class="nav-link" href="{{url_for('login')}}">login</a>
+              <a class="nav-link" href="{{url_for('register')}}">register</a>
               {% endif %}
 
               {% if 'username' in session %}
