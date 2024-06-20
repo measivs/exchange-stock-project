@@ -127,7 +127,7 @@ def company_details(name):
 @app.route('/personal')
 def personal():
     try:
-        companies = fetch_company_names(limit=50)
+        companies = fetch_company_names(limit=100)
         if companies:
             return render_template('home.html', companies=companies)
         else:
