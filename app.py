@@ -110,7 +110,7 @@ def analyze_company(company):
         return None
 
 
-def fetch_and_store_companies(limit=50):
+def fetch_and_store_companies(limit=100):
     companies = fetch_company_names(limit=limit)
     for company in companies:
         company_data = analyze_company(company)
@@ -131,25 +131,24 @@ def fetch_and_store_companies(limit=50):
 @app.route('/home', methods=["GET", "POST"])
 def home():
     if request.method == 'POST':
-        # Handle POST request (e.g., form submission)
         if request.form.get('refresh'):
-            fetch_and_store_companies(limit=50)
-            return redirect(url_for('home'))  # Redirect to GET /home after refreshing
-    else:
-        # Handle GET request (initial page load)
-        companies_in_db = StockData.query.all()
-        if companies_in_db:
-            companies = [company.company for company in companies_in_db]
-        else:
-            fetch_and_store_companies(limit=50)
-            companies_in_db = StockData.query.all()
-            companies = [company.company for company in companies_in_db]
+            fetch_and_store_companies(limit=700)
+            return redirect(url_for('home'))
 
-        if companies:
-            return render_template('home.html', companies=companies)
-        else:
-            logging.error("No companies found.")
-            return "No companies found.", 500
+    companies_in_db = StockData.query.all()
+    if companies_in_db:
+        companies = [company.company for company in companies_in_db]
+    else:
+        fetch_and_store_companies(limit=50)
+        companies_in_db = StockData.query.all()
+        companies = [company.company for company in companies_in_db]
+
+    if companies:
+        return render_template('home.html', companies=companies)
+    else:
+        logging.error("No companies found.")
+        return "No companies found.", 500
+
 
 
 
