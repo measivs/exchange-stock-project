@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 import logging
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'MEALIZI'
