@@ -126,7 +126,6 @@ def fetch_and_store_companies(limit=100):
                 db.session.add(stock_data)
                 db.session.commit()
 
-
 @app.route('/')
 @app.route('/home', methods=["GET", "POST"])
 def home():
