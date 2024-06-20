@@ -3,20 +3,32 @@ from bs4 import BeautifulSoup
 import requests
 import logging
 from flask_sqlalchemy import SQLAlchemy
-from flask_mail import Mail, Message
+from flask_migrate import Migrate
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'MEALIZI'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///loginn.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-
+migrate = Migrate(app, db)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
+
+class StockData(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    company = db.Column(db.String(10), nullable=False)
+    avg_estimate = db.Column(db.String(20), nullable=False)
+    low_estimate = db.Column(db.String(20), nullable=False)
+    high_estimate = db.Column(db.String(20), nullable=False)
+    sales_growth = db.Column(db.String(10), nullable=False)
+
+    def __repr__(self):
+        return f"<StockData {self.company}>"
 
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -25,7 +37,8 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 def fetch_company_names(limit=50):
     companies = []
     h = {
-        'User-Agent': 'Mozilla/5.0 (Linux; U; Android 4.0.4; en-gb; GT-I9300 Build/IMM76D) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30'
+        'User-Agent': 'Mozilla/5.0 (Linux; U; Android 4.0.4; en-gb; GT-I9300 Build/IMM76D) AppleWebKit/534.30 (KHTML, '
+                      'like Gecko) Version/4.0 Mobile Safari/534.30'
     }
     pages = limit // 25 + (limit % 25 > 0)  # Calculate the number of pages to fetch
 
@@ -64,7 +77,8 @@ def fetch_company_names(limit=50):
 
 def analyze_company(company):
     h = {
-        'User-Agent': 'Mozilla/5.0 (Linux; U; Android 4.0.4; en-gb; GT-I9300 Build/IMM76D) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30'
+        'User-Agent': 'Mozilla/5.0 (Linux; U; Android 4.0.4; en-gb; GT-I9300 Build/IMM76D) AppleWebKit/534.30 (KHTML, '
+                      'like Gecko) Version/4.0 Mobile Safari/534.30'
     }
     url = f"https://finance.yahoo.com/quote/{company}/analysis/"
     logging.debug(f"Fetching URL for analysis: {url}")
@@ -96,30 +110,55 @@ def analyze_company(company):
         return None
 
 
+def fetch_and_store_companies(limit=50):
+    companies = fetch_company_names(limit=limit)
+    for company in companies:
+        company_data = analyze_company(company)
+        if company_data:
+            if not StockData.query.filter_by(company=company_data['Company']).first():
+                stock_data = StockData(
+                    company=company_data['Company'],
+                    avg_estimate=company_data.get('Avg. Estimate', ''),
+                    low_estimate=company_data.get('Low Estimate', ''),
+                    high_estimate=company_data.get('High Estimate', ''),
+                    sales_growth=company_data.get('Sales Growth (year/est)', '')
+                )
+                db.session.add(stock_data)
+                db.session.commit()
+
+
 @app.route('/')
-@app.route('/home')
+@app.route('/home', methods=["GET", "POST"])
 def home():
-    try:
-        companies = fetch_company_names(limit=50)
+    if request.method == 'POST':
+        # Handle POST request (e.g., form submission)
+        if request.form.get('refresh'):
+            fetch_and_store_companies(limit=50)
+            return redirect(url_for('home'))  # Redirect to GET /home after refreshing
+    else:
+        # Handle GET request (initial page load)
+        companies_in_db = StockData.query.all()
+        if companies_in_db:
+            companies = [company.company for company in companies_in_db]
+        else:
+            fetch_and_store_companies(limit=50)
+            companies_in_db = StockData.query.all()
+            companies = [company.company for company in companies_in_db]
+
         if companies:
             return render_template('home.html', companies=companies)
         else:
             logging.error("No companies found.")
             return "No companies found.", 500
-    except Exception as e:
-        logging.error(f"An error occurred: {e}")
-        return str(e), 500
+
 
 
 @app.route('/company/<name>')
 def company_details(name):
     try:
-        company_data = analyze_company(name)
-        if company_data and 'Company' in company_data:
-            return render_template('company.html', company_data=company_data)
-        else:
-            logging.error(f"No data found for company: {name}")
-            return "No data found for company.", 404
+        company_data = StockData.query.filter_by(company=name).first()
+        # company_data = analyze_company(name)
+        return render_template('company.html', company_data=company_data)
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         return str(e), 500
