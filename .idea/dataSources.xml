@@ -2,7 +2,7 @@
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
     <data-source source="LOCAL" name="loginn" uuid="c7bac362-c54b-45d1-b2a9-f2765633b5af">
-      <driver-ref>sqlite.xerial</driver-ref>
+      <driver-ref>7cae4191-d3ce-43f9-9bd4-a9dcfcdad6d6</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/instance/loginn.sqlite</jdbc-url>

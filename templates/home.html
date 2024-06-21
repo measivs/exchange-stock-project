@@ -47,8 +47,9 @@
               <a class="nav-link" href="{{url_for('login')}}">Login</a>
               {% endif %}
               {% if 'username' in session %}
-              <a class="nav-link" href="{{url_for('personal')}}">Personal</a>
+              
               <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
+              
               {% endif %}
             </div>
           </div>
@@ -66,7 +67,7 @@
                     <th scope="col">Company</th>
                 </tr>
             </thead>
-            <tbody id="tableBody"> <!-- Added ID for table body -->
+            <tbody id="tableBody"> 
                 {% for company in companies %}
                 <tr>
                     <td><a href="{{ url_for('company_details', name=company) }}">{{ company }}</a></td>
@@ -88,7 +89,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybBd4ynKnQGgDg9e6jL5D1/4r7O3OAoEGeGPdh6X6Ze6gD8Ay" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-ku1CKRQbOamHhUlkPV1DRzAedN06P0j6F9+3grTLIJ5AA6bH8IpXKfCL9cA9iNU3" crossorigin="anonymous"></script>
 
-    <!-- Custom JavaScript for search functionality -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('searchInput');
@@ -96,11 +96,8 @@
 
             document.getElementById('searchButton').addEventListener('click', function() {
                 const searchValue = searchInput.value.toLowerCase().trim();
-
-                // Get all table rows
                 const rows = tableBody.getElementsByTagName('tr');
 
-                // Loop through each row and hide/show based on search input
                 for (const row of rows) {
                     const companyName = row.textContent.toLowerCase().trim();
 

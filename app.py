@@ -5,7 +5,6 @@ import logging
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'MEALIZI'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///loginn.sqlite'
@@ -30,17 +29,15 @@ class StockData(db.Model):
     def __repr__(self):
         return f"<StockData {self.company}>"
 
-
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
-def fetch_company_names(limit=50):
+def fetch_company_names(limit=70):
     companies = []
     h = {
         'User-Agent': 'Mozilla/5.0 (Linux; U; Android 4.0.4; en-gb; GT-I9300 Build/IMM76D) AppleWebKit/534.30 (KHTML, '
                       'like Gecko) Version/4.0 Mobile Safari/534.30'
     }
-    pages = limit // 25 + (limit % 25 > 0)  # Calculate the number of pages to fetch
+    pages = limit // 25 + (limit % 25 > 0)
 
     for page in range(pages):
         offset = page * 25
@@ -73,7 +70,6 @@ def fetch_company_names(limit=50):
             continue
 
     return companies
-
 
 def analyze_company(company):
     h = {
@@ -109,8 +105,7 @@ def analyze_company(company):
         logging.error(f"Failed to analyze company {company}: {e}")
         return None
 
-
-def fetch_and_store_companies(limit=100):
+def fetch_and_store_companies(limit=70):
     companies = fetch_company_names(limit=limit)
     for company in companies:
         company_data = analyze_company(company)
@@ -129,16 +124,19 @@ def fetch_and_store_companies(limit=100):
 @app.route('/')
 @app.route('/home', methods=["GET", "POST"])
 def home():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
     if request.method == 'POST':
         if request.form.get('refresh'):
-            fetch_and_store_companies(limit=700)
+            fetch_and_store_companies(limit=70)
             return redirect(url_for('home'))
 
     companies_in_db = StockData.query.all()
     if companies_in_db:
         companies = [company.company for company in companies_in_db]
     else:
-        fetch_and_store_companies(limit=50)
+        fetch_and_store_companies(limit=70)
         companies_in_db = StockData.query.all()
         companies = [company.company for company in companies_in_db]
 
@@ -148,33 +146,16 @@ def home():
         logging.error("No companies found.")
         return "No companies found.", 500
 
-
-
-
 @app.route('/company/<name>')
 def company_details(name):
+    if 'username' not in session:
+        return redirect(url_for('login'))
     try:
         company_data = StockData.query.filter_by(company=name).first()
-        # company_data = analyze_company(name)
         return render_template('company.html', company_data=company_data)
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         return str(e), 500
-
-
-@app.route('/personal')
-def personal():
-    try:
-        companies = fetch_company_names(limit=100)
-        if companies:
-            return render_template('home.html', companies=companies)
-        else:
-            logging.error("No companies found.")
-            return "No companies found.", 500
-    except Exception as e:
-        logging.error(f"An error occurred: {e}")
-        return str(e), 500
-
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
@@ -188,9 +169,8 @@ def register():
         db.session.commit()
 
         session['username'] = uname
-        return redirect(url_for("personal"))
+        return redirect(url_for("home"))
     return render_template("register.html")
-
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
@@ -200,24 +180,15 @@ def login():
         user = User.query.filter_by(username=username, password=password).first()
         if user:
             session['username'] = user.username
-            return redirect(url_for('personal'))
+            return redirect(url_for('home'))
         else:
             return "Invalid credentials"
     return render_template('login.html')
 
-
 @app.route('/logout')
 def logout():
     session.pop('username', None)
-    return render_template('logout.html')
-
-
-# @app.route('/user')
-# def user():
-#     if 'username' in session:
-#         return render_template('user.html', username=session['username'])
-#     return redirect(url_for('login'))
-
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     with app.app_context():
